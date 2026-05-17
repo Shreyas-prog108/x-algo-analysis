@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Claude vs GPT: X Algorithm Analysis</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Claude vs GPT: X Algorithm Analysis</h1>
+</header>
+<h1
+id="i-made-claude-opus-4.6-max-and-gpt-5.5-analyze-the-x-algorithm.-then-i-made-them-judge-each-other.">I
+Made Claude Opus 4.6 Max and GPT-5.5 Analyze the X Algorithm. Then I
+Made Them Judge Each Other.</h1>
+<p><em>By <a href="https://x.com/Shreyas_Pandeyy"><span class="citation"
+data-cites="Shreyas_Pandeyy">@Shreyas_Pandeyy</span></a></em></p>
+<hr />
+<p>Both models analyzed the same open-source X “For You” algorithm
+repository (May 2026 release). Same codebase. Same task. Independent
+runs. Then I asked each one to compare the reports and pick a
+winner.</p>
+<p>Predictably, each model picked itself.</p>
+<p>Here’s what actually happened.</p>
+<hr />
+<h2 id="the-setup">The Setup</h2>
+<p><strong>Task:</strong> Go through the entire X algorithm repo and
+produce a summary report covering how the algorithm works, what it
+favors, how to boost reach, and what to avoid.</p>
+<p><strong>Models used:</strong></p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th></th>
+<th>Claude</th>
+<th>GPT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Model</strong></td>
+<td>Claude Opus 4.6 Max</td>
+<td>GPT-5.5 Extra-High</td>
+</tr>
+<tr>
+<td><strong>Context Window</strong></td>
+<td>1M tokens</td>
+<td>1M tokens</td>
+</tr>
+<tr>
+<td><strong>Variant</strong></td>
+<td>Maximum (highest reasoning tier)</td>
+<td>Extra-High (highest reasoning tier)</td>
+</tr>
+<tr>
+<td><strong>Mode</strong></td>
+<td>Agentic coding (parallel subagents)</td>
+<td>Agentic coding</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why Opus 4.6 instead of 4.7?</strong> The general sentiment
+and benchmarks around Opus 4.7 suggest its performance hasn’t matched
+4.6 for deep code analysis tasks. Opus 4.6 remains the stronger pick for
+thorough, multi-file repository exploration – which is exactly what this
+task demands.</p>
+<p>Both models had full access to the same files:
+<code>home-mixer/</code> (Rust orchestration), <code>phoenix/</code>
+(Python/JAX ML models), <code>thunder/</code> (Rust in-network store),
+<code>grox/</code> (Python content classifiers), and
+<code>candidate-pipeline/</code> (Rust framework). Both ran at their
+maximum context and reasoning tiers.</p>
+<hr />
+<h2 id="what-they-produced">What They Produced</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Deliverable</th>
+<th>Claude</th>
+<th>GPT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PDF Report</strong></td>
+<td>7 pages</td>
+<td>4 pages</td>
+</tr>
+<tr>
+<td><strong>X Thread</strong></td>
+<td>20 posts</td>
+<td>16 posts</td>
+</tr>
+<tr>
+<td><strong>Tables</strong></td>
+<td>More structured tables</td>
+<td>Fewer, more compressed tables</td>
+</tr>
+<tr>
+<td><strong>Pipeline stages identified</strong></td>
+<td>10 (granular)</td>
+<td>6 (grouped)</td>
+</tr>
+<tr>
+<td><strong>Positive signals listed</strong></td>
+<td>15 (individually named)</td>
+<td>10 (grouped in prose)</td>
+</tr>
+<tr>
+<td><strong>Negative signals listed</strong></td>
+<td>5 (with severity ratings)</td>
+<td>5 (in table)</td>
+</tr>
+<tr>
+<td><strong>Strategies</strong></td>
+<td>8 numbered</td>
+<td>10 numbered</td>
+</tr>
+<tr>
+<td><strong>Don’ts</strong></td>
+<td>9 with severity (CRITICAL/HIGH/MEDIUM)</td>
+<td>7 in the PDF, 9 in the article</td>
+</tr>
+<tr>
+<td><strong>Caveats section</strong></td>
+<td>Inline mentions</td>
+<td>Dedicated 4-point section</td>
+</tr>
+<tr>
+<td><strong>Code snippets</strong></td>
+<td>Yes (VQV eligibility check)</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Grox classifier coverage</strong></td>
+<td>6 classifiers/signals, with some thresholds or score scales</td>
+<td>Brief mention</td>
+</tr>
+<tr>
+<td><strong>Technical insights section</strong></td>
+<td>Yes (candidate isolation, hashing, etc.)</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="how-each-model-judged-the-other">How Each Model Judged the
+Other</h2>
+<h3 id="claudes-self-evaluation">Claude’s Self-Evaluation</h3>
+<p>Claude scored across 9 dimensions (each /10):</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>GPT</th>
+<th>Claude</th>
+<th>Winner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Technical Depth</td>
+<td>7</td>
+<td>9</td>
+<td>Claude</td>
+</tr>
+<tr>
+<td>Code-Level Specificity</td>
+<td>6</td>
+<td>9</td>
+<td>Claude</td>
+</tr>
+<tr>
+<td>Unique Insights</td>
+<td>6</td>
+<td>9</td>
+<td>Claude</td>
+</tr>
+<tr>
+<td>Actionability</td>
+<td>8</td>
+<td>8</td>
+<td>Tie</td>
+</tr>
+<tr>
+<td>Accuracy / Honesty</td>
+<td>9</td>
+<td>8</td>
+<td>GPT</td>
+</tr>
+<tr>
+<td>PDF Conciseness</td>
+<td>9</td>
+<td>7</td>
+<td>GPT</td>
+</tr>
+<tr>
+<td>X Thread Shareability</td>
+<td>9</td>
+<td>7</td>
+<td>GPT</td>
+</tr>
+<tr>
+<td>Creator Accessibility</td>
+<td>9</td>
+<td>7</td>
+<td>GPT</td>
+</tr>
+<tr>
+<td>PDF Comprehensiveness</td>
+<td>7</td>
+<td>9</td>
+<td>Claude</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>70</strong></td>
+<td><strong>73</strong></td>
+<td><strong>Claude</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Claude’s verdict: <em>“Claude goes deeper technically; GPT is more
+disciplined editorially.”</em></p>
+<h3 id="gpts-self-evaluation">GPT’s Self-Evaluation</h3>
+<p>GPT scored across 6 dimensions (weighted):</p>
+<table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>Weight</th>
+<th>GPT</th>
+<th>Claude</th>
+<th>Winner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code Accuracy</td>
+<td>30%</td>
+<td>8.5</td>
+<td>6.5</td>
+<td>GPT</td>
+</tr>
+<tr>
+<td>Evidence Discipline</td>
+<td>20%</td>
+<td>9.0</td>
+<td>6.0</td>
+<td>GPT</td>
+</tr>
+<tr>
+<td>Completeness</td>
+<td>15%</td>
+<td>7.0</td>
+<td>9.0</td>
+<td>Claude</td>
+</tr>
+<tr>
+<td>Practical Usefulness</td>
+<td>15%</td>
+<td>8.0</td>
+<td>8.5</td>
+<td>Claude</td>
+</tr>
+<tr>
+<td>Caveats &amp; Uncertainty</td>
+<td>10%</td>
+<td>9.0</td>
+<td>5.5</td>
+<td>GPT</td>
+</tr>
+<tr>
+<td>Readability/Shareability</td>
+<td>10%</td>
+<td>7.5</td>
+<td>8.5</td>
+<td>Claude</td>
+</tr>
+<tr>
+<td><strong>Weighted Total</strong></td>
+<td><strong>100%</strong></td>
+<td><strong>8.35</strong></td>
+<td><strong>7.18</strong></td>
+<td><strong>GPT</strong></td>
+</tr>
+</tbody>
+</table>
+<p>GPT’s verdict: <em>“GPT report is better as the factual base. Claude
+has stronger packaging but needs factual cleanup.”</em></p>
+<hr />
+<h2 id="the-pattern-both-models-are-biased">The Pattern: Both Models Are
+Biased</h2>
+<p>The scoring reveals exactly what you’d expect:</p>
+<ul>
+<li><strong>Claude gives itself a 3-point lead</strong> (73 vs 70) by
+weighing technical depth and code specificity heavily.</li>
+<li><strong>GPT gives itself a 1.17-point lead</strong> (8.35 vs 7.18)
+by weighting code accuracy, evidence discipline, and caveats at 60% of
+the total score.</li>
+</ul>
+<p>Each model designed a scoring rubric that favored its own
+strengths.</p>
+<p>Claude’s rubric rewards depth. GPT’s rubric rewards caution. Both are
+valid. Neither is neutral.</p>
+<hr />
+<h2 id="where-gpt-genuinely-wins">Where GPT Genuinely Wins</h2>
+<p><strong>1. Caveats and intellectual honesty.</strong> GPT’s report
+has a dedicated 4-point caveats section explicitly stating: this is a
+partial OSS repo, not live production; runtime weights are missing; no
+SimClusters/RealGraph/TwHIN found. Claude mentions these things inline
+but doesn’t call them out as prominently.</p>
+<p><strong>2. Conservative claims.</strong> GPT avoids labeling signal
+weights as “Very High” or “Very Strong Negative” since the actual
+numeric weights aren’t in the repo. Claude assigns impact levels that
+are reasonable inferences but not directly provable from the code.</p>
+<p><strong>3. Tweet-native thread.</strong> GPT’s 16-post thread was
+explicitly checked to stay under 280 characters per post. Claude’s
+20-post thread has richer content but would need more editing before
+being pasted directly as X posts.</p>
+<p><strong>4. Conciseness.</strong> 4 pages vs 7 pages. GPT says what
+needs to be said and stops.</p>
+<p><strong>5. GPT correctly flagged Claude overclaims.</strong> GPT’s
+comparison report lists 10 specific Claude claims that are overstated –
+like “quality below 0.4 = removed from feed” (the threshold exists for
+classifier positivity, but feed removal isn’t proven) and “first 60
+minutes are critical” (post-age buckets use 60-min granularity, but a
+first-hour rule isn’t proven). These are valid criticisms.</p>
+<hr />
+<h2 id="where-claude-genuinely-wins">Where Claude Genuinely Wins</h2>
+<p><strong>1. Technical depth.</strong> Claude identified signals GPT
+didn’t mention at all: the three separate share signals (share, DM
+share, copy-link share), click_dwell_time as a third dwell signal, the
+negative score offset rescaling formula, mutual follow Jaccard via
+MinHash, post age bucketing specifics (4800 min, 60-min granularity),
+brand safety tiers, and Grox slop_score detection.</p>
+<p><strong>2. Code-level evidence.</strong> Claude includes actual
+variable names from the codebase
+(<code>favorite_score x FAVORITE_WEIGHT</code>,
+<code>block_author_score x BLOCK_AUTHOR_WEIGHT</code>), specific
+constants (<code>POST_AGE_MAX_MINUTES = 4800</code>,
+<code>MIN_HASHES = 256</code>, <code>history_seq_len=128</code>), and a
+code snippet showing the VQV eligibility check.</p>
+<p><strong>3. Formulas.</strong> Claude documents the actual author
+diversity decay formula
+(<code>multiplier = (1 - floor) x decay^position + floor</code>) with a
+worked example, the negative score offset formula, and the weighted
+scoring structure. GPT mentions these exist but doesn’t show the
+math.</p>
+<p><strong>4. Grox pipeline.</strong> Claude names and describes 6
+individual Grox classifiers/signals (BangerInitialScreen,
+SpamEapiLowFollowerClassifier, SafetyPtosCategoryClassifier,
+SafetyPtosPolicyClassifier, PostSafetyDeluxeClassifier, ReplyScorer),
+including some thresholds or score scales. GPT mentions Grox
+briefly.</p>
+<p><strong>5. Architecture insights.</strong> Claude covers candidate
+isolation in the transformer attention mask, hash-based identity
+representation, new-user routing / OON-factor handling, and the
+128-action engagement history window. GPT doesn’t have a technical
+insights section.</p>
+<hr />
+<h2 id="the-algorithm-what-both-agree-on">The Algorithm: What Both Agree
+On</h2>
+<p>Despite their rivalry, both reports reach the same core conclusions
+about how X’s For You algorithm works:</p>
+<p><strong>The Pipeline:</strong> Viewer context -&gt; Candidate
+retrieval (in-network via Thunder + out-of-network via Phoenix) -&gt;
+Hydration -&gt; Filtering -&gt; ML scoring (Grok-based transformer
+predicts engagement probabilities) -&gt; Weighted combination -&gt;
+Diversity/OON adjustment -&gt; Selection -&gt; Safety filtering.</p>
+<p><strong>The Formula:</strong> Final Score = weighted sum of predicted
+positive engagement probabilities minus weighted negative engagement
+probabilities.</p>
+<p><strong>What helps reach:</strong> - Multi-signal engagement (replies
++ reposts + shares, not just likes) - Dwell time (the algorithm measures
+reading duration) - Topic consistency (embedding-based retrieval rewards
+niche clarity) - Video quality views (duration-gated bonus) - Freshness
+(age filters + post age in model features) - Follow conversions
+(P(follow_author) is a scoring signal)</p>
+<p><strong>What can hurt reach:</strong> - Blocks, mutes, reports
+(negative scoring weights) - Safety/policy violations (can be removed or
+restricted post-ranking) - Spam replies (Grox detection / distribution
+risk) - Flooding (author diversity decay is exponential) - Scroll-past
+content (not_dwelled is a negative signal) - Duplicates (multiple dedup
+filters)</p>
+<hr />
+<h2 id="the-verdict">The Verdict</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>If you need…</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A trusted, defensible research foundation</td>
+<td>GPT’s report</td>
+</tr>
+<tr>
+<td>Deep technical reference with formulas and code evidence</td>
+<td>Claude’s report</td>
+</tr>
+<tr>
+<td>A thread to post on X right now</td>
+<td>GPT’s thread</td>
+</tr>
+<tr>
+<td>A rich X Article with surprising insights</td>
+<td>Claude’s report</td>
+</tr>
+<tr>
+<td>Understanding of Grox classifiers and safety pipeline</td>
+<td>Claude’s report</td>
+</tr>
+<tr>
+<td>Conservative, caveat-first framing</td>
+<td>GPT’s report</td>
+</tr>
+<tr>
+<td>Architecture details (attention masking, embeddings, RoPE)</td>
+<td>Claude’s report</td>
+</tr>
+<tr>
+<td>Quick 5-minute executive briefing</td>
+<td>GPT’s report</td>
+</tr>
+</tbody>
+</table>
+<p><strong>My take:</strong> GPT plays it safe and gets the fundamentals
+right with excellent disclaimers. Claude goes deeper, surfaces more
+code-level insights, and gives you things GPT simply doesn’t cover – but
+occasionally states inferences as facts.</p>
+<p>The ideal approach: <strong>GPT for truth. Claude for depth. Combine
+both for the complete picture.</strong></p>
+<p>Both models analyzed the same code and independently arrived at the
+same core conclusions. The algorithm rewards genuine engagement,
+punishes negative feedback, and filters aggressively. No hack beats
+being genuinely relevant to a specific audience.</p>
+<hr />
+<p><em>Both reports, comparison PDFs, and this article are available in
+the <a
+href="https://github.com/Shreyas-prog108/x-algo-analysis">x-algo-analysis
+repository</a>. Analyzed by Claude Opus 4.6 Max and GPT-5.5 Extra-High –
+both at 1M token context, maximum reasoning tiers.</em></p>
+<p><em><a href="https://x.com/Shreyas_Pandeyy"><span class="citation"
+data-cites="Shreyas_Pandeyy">@Shreyas_Pandeyy</span></a></em></p>
+</body>
+</html>
