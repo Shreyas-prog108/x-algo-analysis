@@ -23,7 +23,7 @@ Here's what actually happened.
 | **Model** | Claude Opus 4.6 Max | GPT-5.5 Extra-High |
 | **Context Window** | 1M tokens | 1M tokens |
 | **Variant** | Maximum (highest reasoning tier) | Extra-High (highest reasoning tier) |
-| **Mode** | Cursor Agent (parallel subagents) | Cursor Agent |
+| **Mode** | Agentic coding (parallel subagents) | Agentic coding |
 
 **Why Opus 4.6 instead of 4.7?** The general sentiment and benchmarks around Opus 4.7 suggest its performance hasn't matched 4.6 for deep code analysis tasks. Opus 4.6 remains the stronger pick for thorough, multi-file repository exploration -- which is exactly what this task demands.
 
