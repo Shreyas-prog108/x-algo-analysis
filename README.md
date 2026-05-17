@@ -129,3 +129,7 @@ The algorithm source code analyzed: [x-algorithm](https://github.com/xai-org/x-a
 ## License
 
 Analysis reports and comparison content are original work. The underlying algorithm code is licensed under Apache 2.0 by X.AI Corp.
+
+---
+
+*This README was prepared by Claude Opus 4.6 Max (1M token context).*
