@@ -1,0 +1,67 @@
+# Python
+*.py
+*.pyc
+__pycache__/
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+venv/
+.venv/
+env/
+
+# Rust
+target/
+*.rs
+Cargo.lock
+Cargo.toml
+
+# Java / Scala
+*.java
+*.scala
+*.class
+*.jar
+
+# Node
+node_modules/
+*.js
+*.ts
+*.tsx
+!*.d.ts
+
+# Source code (general)
+*.c
+*.cpp
+*.h
+*.go
+*.rb
+*.swift
+*.kt
+*.m
+*.mm
+*.sh
+
+# Config that might leak
+.env
+.env.*
+*.pem
+*.key
+credentials.*
+secrets.*
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Temp
+tmp/
+temp/
+*.tmp
